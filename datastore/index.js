@@ -39,20 +39,30 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  fs.readFile(`${exports.dataDir}/${id}.txt`, (err, data) => {
-    if(data === null){
-      console.log(`No item with id: ${id}`);
+  fs.readFile(`${exports.dataDir}/${id}.txt`, 'UTF-8', (err, data) => {
+    if(!data){
+      callback(err);
     }else if(err){
-      console.log(err);
+      callback(null, err);
     }else{
-      done(callback(null, data));
+      callback(null, { id: id, text : data});
     }
-  });
+  })
 };
 
 exports.update = (id, text, callback) => {
-  if (path.join(__dirname, 'data', id) === id ){
-  }
+  const exist = fs.existsSync(`${exports.dataDir}/${id}.txt`);
+    if(exist === false){
+      callback(true);
+    }else{
+  fs.writeFile(`${exports.dataDir}/${id}.txt`, text, (err) => {
+    if (err) {
+      throw ('error updating');
+    } else {
+        callback(null, text);
+      }
+    })
+  //})
   // var item = items[id];
   // if (!item) {
   //   callback(new Error(`No item with id: ${id}`));
@@ -60,17 +70,25 @@ exports.update = (id, text, callback) => {
   //   items[id] = text;
   //   callback(null, { id, text });
   // }
-};
+  }
+}
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  const exist = fs.existsSync(`${exports.dataDir}/${id}.txt`);
+    if(exist === false){
+      callback(true);
+    }else{
+      fs.unlinkSync(`${exports.dataDir}/${id}.txt`);
+      callback();
+    }
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
