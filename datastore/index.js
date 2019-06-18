@@ -9,60 +9,50 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) =>{
-    if(err){
-    console.log('I hate callbacks');
-    }else{
-      fs.writeFile((`${exports.dataDir}/${id}`), text, (err) => {
-      if (err) {
-        throw ('error writing counter');
-      } else {
-        callback(null, {id, text});    
-      }
-    });
+    if (err) {
+      console.log('I hate callbacks');
+    } else {
+      fs.writeFile((`${exports.dataDir}/${id}.txt`), text, (err) => {
+        if (err) {
+          throw ('error writing counter');
+        } else {
+          callback(null, {id, text});    
+        }
+      });
     }
   });
-  //items[id] = text;
-  //callback(null, { id, text });
 };
 
 exports.readAll = (callback) => {
   fs.readdir(`${exports.dataDir}`, (err, data) => {
-//console.log(typeof(data));
-    if(err){
+    if (err) {
       console.log(err);
-    } else{
-        let arr = [];
-        for(var i = 0; i < data.length; i++){
-     //console.log(data[i])
-          arr.push({id : data[i], text : data[i]});
-        }
-      //console.log('our array', arr);
-      callback(null, arr);
+    } else {
+      let arr = [];
+      for (var i = 0; i < data.length; i++) {
+        let a = data[i].split('.');
+        arr.push({id : a[0], text : a[0]});
       }
-  })
+      callback(null, arr);
+    }
+  });
 };
 
 exports.readOne = (id, callback) => {
-  fs.readFile(path.join(__dirname, 'data', id), (err, data) => {
-    if(err){
-      console.log('readOne error');
-    }else if(!data){
-      callback(new Error(`No item with id: ${id}`));
+  fs.readFile(`${exports.dataDir}/${id}.txt`, (err, data) => {
+    if(data === null){
+      console.log(`No item with id: ${id}`);
+    }else if(err){
+      console.log(err);
     }else{
-      callback(null, data);
+      done(callback(null, data));
     }
-  })
-  // if (!text) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback(null, { id, text });
-  // }
+  });
 };
 
 exports.update = (id, text, callback) => {
-console.log(path.join(__dirname, 'data', id), id, path.join(__dirname, 'data', id) === id);
   if (path.join(__dirname, 'data', id) === id ){
-}
+  }
   // var item = items[id];
   // if (!item) {
   //   callback(new Error(`No item with id: ${id}`));
